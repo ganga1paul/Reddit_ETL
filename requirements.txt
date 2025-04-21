@@ -1,0 +1,4 @@
+apache-airflow==2.7.2 # Replace with your Airflow version
+praw
+pyspark
+psycopg2-binary

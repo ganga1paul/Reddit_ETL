@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: hello123
+      POSTGRES_DB: reddit_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - airflow_network
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - AIRFLOW_HOME=/opt/airflow
+    volumes:
+      - ./dag:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+      - ./config:/opt/airflow/config   # Mount the config folder containing db_config.json
+    ports:
+      - "8080:8080"
+    networks:
+      - airflow_network
+    depends_on:
+      - postgres
+    command: ["bash", "-c", "airflow db init && airflow webserver & airflow scheduler"]
+
+  airflow-worker:
+    image: apache/airflow:2.7.2-python3.10
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./scripts:/opt/airflow/scripts
+    networks:
+      - airflow_network
+    depends_on:
+      - airflow
+
+networks:
+  airflow_network:
+    driver: bridge
