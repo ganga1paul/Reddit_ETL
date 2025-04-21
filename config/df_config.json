@@ -1,0 +1,8 @@
+{
+    "dbname": "reddit_db",
+    "user": "root",
+    "password": "hello123",
+    "host": "postgres",
+    "port": 5432
+  }
+  
